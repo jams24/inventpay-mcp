@@ -157,6 +157,7 @@ Once connected, you can ask your AI agent things like:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `INVENTPAY_API_KEY` | Yes | Your InventPay merchant API key |
+| `INVENTPAY_WITHDRAWAL_KEY` | No | Withdrawal API key for programmatic withdrawals (generate from Dashboard → Settings) |
 | `INVENTPAY_BASE_URL` | No | API base URL (default: `https://api.inventpay.io`) |
 
 ## License

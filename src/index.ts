@@ -9,6 +9,7 @@ import { z } from "zod";
 // ============================================================================
 
 const API_KEY = process.env.INVENTPAY_API_KEY;
+const WITHDRAWAL_API_KEY = process.env.INVENTPAY_WITHDRAWAL_KEY;
 const BASE_URL =
   process.env.INVENTPAY_BASE_URL || "https://api.inventpay.io";
 
@@ -25,7 +26,8 @@ if (!API_KEY) {
 async function callApi(
   method: string,
   path: string,
-  body?: Record<string, unknown>
+  body?: Record<string, unknown>,
+  extraHeaders?: Record<string, string>
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   if (!API_KEY) {
     return {
@@ -50,6 +52,7 @@ async function callApi(
     const headers: Record<string, string> = {
       "X-API-Key": API_KEY,
       "Content-Type": "application/json",
+      ...extraHeaders,
     };
 
     const options: RequestInit = { method, headers };
@@ -218,7 +221,7 @@ server.tool(
 
 server.tool(
   "create_withdrawal",
-  "Create a withdrawal request to send funds to an external wallet address. Requires 2FA if enabled on the account.",
+  "Create a withdrawal request to send funds to an external wallet address. Requires INVENTPAY_WITHDRAWAL_KEY to be configured (a separate withdrawal API key generated from Dashboard → Settings).",
   {
     amount: z.number().describe("Amount to withdraw"),
     currency: z
@@ -232,8 +235,29 @@ server.tool(
       .optional()
       .describe("Withdrawal description/memo"),
   },
-  async (params) =>
-    callApi("POST", "/v1/merchant/withdrawal/create", params)
+  async (params) => {
+    if (!WITHDRAWAL_API_KEY) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(
+              {
+                success: false,
+                error:
+                  "INVENTPAY_WITHDRAWAL_KEY is not configured. Generate a withdrawal API key from Dashboard → Settings → Withdrawal API Key, then set it as the INVENTPAY_WITHDRAWAL_KEY environment variable.",
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      };
+    }
+    return callApi("POST", "/v1/merchant/withdrawal/create", params, {
+      "X-Withdrawal-Key": WITHDRAWAL_API_KEY,
+    });
+  }
 );
 
 server.tool(
