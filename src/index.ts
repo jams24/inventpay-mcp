@@ -438,6 +438,63 @@ server.tool(
 );
 
 // ============================================================================
+// KEY POOL TOOLS
+// ============================================================================
+
+server.tool(
+  "add_product_keys",
+  "Upload unique keys/codes to a product's key pool. Each customer gets one unique key on purchase (FIFO). Use this for license keys, activation codes, gift cards, etc.",
+  {
+    productId: z.string().describe("Product ID"),
+    keys: z
+      .array(z.string())
+      .describe("Array of unique keys/codes to add (max 10,000 per request)"),
+    label: z
+      .string()
+      .optional()
+      .describe("Optional batch label (e.g. 'Batch #1', 'Premium Keys')"),
+  },
+  async ({ productId, ...body }) =>
+    callApi(
+      "POST",
+      `/v1/store/manage/products/${encodeURIComponent(productId)}/keys`,
+      body
+    )
+);
+
+server.tool(
+  "list_product_keys",
+  "List keys in a product's key pool with status filter and pagination.",
+  {
+    productId: z.string().describe("Product ID"),
+    page: z.number().optional().describe("Page number (default 1)"),
+    limit: z.number().optional().describe("Items per page, 1-100 (default 50)"),
+    status: z
+      .enum(["AVAILABLE", "ASSIGNED", "REVOKED"])
+      .optional()
+      .describe("Filter by key status"),
+  },
+  async ({ productId, ...params }) =>
+    callApi(
+      "GET",
+      `/v1/store/manage/products/${encodeURIComponent(productId)}/keys${buildQuery(params)}`
+    )
+);
+
+server.tool(
+  "get_key_pool_stats",
+  "Get key pool statistics for a product: available, assigned, revoked, and total counts.",
+  {
+    productId: z.string().describe("Product ID"),
+  },
+  async ({ productId }) =>
+    callApi(
+      "GET",
+      `/v1/store/manage/products/${encodeURIComponent(productId)}/keys/stats`
+    )
+);
+
+// ============================================================================
 // ORDER TOOLS
 // ============================================================================
 
