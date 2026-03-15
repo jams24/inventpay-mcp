@@ -405,6 +405,18 @@ server.tool(
       .optional()
       .describe("Custom key-value metadata"),
     digitalContent: digitalContentSchema,
+    contentType: z
+      .enum(["GENERAL", "SKILL"])
+      .optional()
+      .describe(
+        "Product content type. GENERAL (default) for standard digital products, SKILL for AI agent skill files (.md with YAML frontmatter). When SKILL, provide skillContent."
+      ),
+    skillContent: z
+      .string()
+      .optional()
+      .describe(
+        "Raw SKILL.md file content (markdown with YAML frontmatter). Only used when contentType is SKILL. Backend auto-parses frontmatter for storefront display. Max 100,000 chars."
+      ),
   },
   async (params) => enrichProductUrls(await callApi("POST", "/v1/store/manage/products", params))
 );
@@ -462,6 +474,18 @@ server.tool(
       .optional()
       .describe("Custom key-value metadata"),
     digitalContent: digitalContentSchema,
+    contentType: z
+      .enum(["GENERAL", "SKILL"])
+      .optional()
+      .describe(
+        "Product content type. GENERAL or SKILL. Switching from SKILL to GENERAL clears skill fields."
+      ),
+    skillContent: z
+      .string()
+      .optional()
+      .describe(
+        "Raw SKILL.md file content. Only used when contentType is SKILL. Backend re-parses frontmatter on update."
+      ),
   },
   async ({ id, ...body }) =>
     enrichProductUrls(await callApi("PUT", `/v1/store/manage/products/${encodeURIComponent(id)}`, body))
