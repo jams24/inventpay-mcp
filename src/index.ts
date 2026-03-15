@@ -335,6 +335,46 @@ server.tool(
 );
 
 // ============================================================================
+// Product URL Helper
+// ============================================================================
+
+async function enrichProductUrls(
+  result: { content: Array<{ type: "text"; text: string }> }
+): Promise<{ content: Array<{ type: "text"; text: string }> }> {
+  try {
+    const storeResult = await callApi("GET", "/v1/store/manage");
+    const storeData = JSON.parse(storeResult.content[0].text);
+    if (!storeData.success) return result;
+
+    const storeSlug = storeData.data?.slug;
+    if (!storeSlug) return result;
+
+    const data = JSON.parse(result.content[0].text);
+    if (!data.success) return result;
+
+    // Single product (create/update)
+    if (data.data?.slug) {
+      data.data.productUrl = `https://inventpay.io/store/${storeSlug}/product/${data.data.slug}`;
+    }
+
+    // Product list
+    if (Array.isArray(data.data?.products)) {
+      for (const product of data.data.products) {
+        if (product.slug) {
+          product.productUrl = `https://inventpay.io/store/${storeSlug}/product/${product.slug}`;
+        }
+      }
+    }
+
+    return {
+      content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
+    };
+  } catch {
+    return result;
+  }
+}
+
+// ============================================================================
 // PRODUCT TOOLS
 // ============================================================================
 
@@ -366,7 +406,7 @@ server.tool(
       .describe("Custom key-value metadata"),
     digitalContent: digitalContentSchema,
   },
-  async (params) => callApi("POST", "/v1/store/manage/products", params)
+  async (params) => enrichProductUrls(await callApi("POST", "/v1/store/manage/products", params))
 );
 
 server.tool(
@@ -384,7 +424,7 @@ server.tool(
       .describe("Search products by name"),
   },
   async (params) =>
-    callApi("GET", `/v1/store/manage/products${buildQuery(params)}`)
+    enrichProductUrls(await callApi("GET", `/v1/store/manage/products${buildQuery(params)}`))
 );
 
 server.tool(
@@ -424,7 +464,7 @@ server.tool(
     digitalContent: digitalContentSchema,
   },
   async ({ id, ...body }) =>
-    callApi("PUT", `/v1/store/manage/products/${encodeURIComponent(id)}`, body)
+    enrichProductUrls(await callApi("PUT", `/v1/store/manage/products/${encodeURIComponent(id)}`, body))
 );
 
 server.tool(

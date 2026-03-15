@@ -16,11 +16,12 @@ npx inventpay-mcp
 
 ## Configuration
 
-### Get your API Key
+### Get your API Keys
 
 1. Sign up at [inventpay.io](https://inventpay.io)
 2. Go to **Dashboard → Settings**
-3. Copy your API key
+3. Copy your **API key** (`pk_live_...`) — used for all operations (payments, invoices, store, products, orders, balances)
+4. *(Optional)* Generate a **Withdrawal API key** (`wk_live_...`) — used exclusively for withdrawing funds to external wallets
 
 ### Claude Desktop
 
@@ -33,12 +34,15 @@ Add to your `claude_desktop_config.json`:
       "command": "npx",
       "args": ["-y", "inventpay-mcp"],
       "env": {
-        "INVENTPAY_API_KEY": "your-api-key-here"
+        "INVENTPAY_API_KEY": "your-api-key-here",
+        "INVENTPAY_WITHDRAWAL_KEY": "your-withdrawal-key-here"
       }
     }
   }
 }
 ```
+
+> `INVENTPAY_WITHDRAWAL_KEY` is optional. Without it, all tools work except `create_withdrawal`.
 
 ### Claude Code
 
@@ -46,10 +50,11 @@ Add to your `claude_desktop_config.json`:
 claude mcp add inventpay -- npx -y inventpay-mcp
 ```
 
-Then set the environment variable:
+Then set the environment variables:
 
 ```bash
 export INVENTPAY_API_KEY="your-api-key-here"
+export INVENTPAY_WITHDRAWAL_KEY="your-withdrawal-key-here"  # Optional — only for withdrawals
 ```
 
 ### Cursor
@@ -63,12 +68,15 @@ Add to your Cursor MCP settings (`.cursor/mcp.json`):
       "command": "npx",
       "args": ["-y", "inventpay-mcp"],
       "env": {
-        "INVENTPAY_API_KEY": "your-api-key-here"
+        "INVENTPAY_API_KEY": "your-api-key-here",
+        "INVENTPAY_WITHDRAWAL_KEY": "your-withdrawal-key-here"
       }
     }
   }
 }
 ```
+
+> `INVENTPAY_WITHDRAWAL_KEY` is optional. Without it, all tools work except `create_withdrawal`.
 
 ### Windsurf
 
@@ -81,12 +89,15 @@ Add to your Windsurf MCP config:
       "command": "npx",
       "args": ["-y", "inventpay-mcp"],
       "env": {
-        "INVENTPAY_API_KEY": "your-api-key-here"
+        "INVENTPAY_API_KEY": "your-api-key-here",
+        "INVENTPAY_WITHDRAWAL_KEY": "your-withdrawal-key-here"
       }
     }
   }
 }
 ```
+
+> `INVENTPAY_WITHDRAWAL_KEY` is optional. Without it, all tools work except `create_withdrawal`.
 
 ## Available Tools
 
@@ -156,8 +167,8 @@ Once connected, you can ask your AI agent things like:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `INVENTPAY_API_KEY` | Yes | Your InventPay merchant API key |
-| `INVENTPAY_WITHDRAWAL_KEY` | No | Withdrawal API key for programmatic withdrawals (generate from Dashboard → Settings) |
+| `INVENTPAY_API_KEY` | Yes | Your merchant API key (`pk_live_...`). Used for **all** operations: payments, invoices, store, products, orders, balances. |
+| `INVENTPAY_WITHDRAWAL_KEY` | No | Withdrawal-only key (`wk_live_...`). Used **exclusively** for withdrawing funds to external wallets. Cannot be used for any other operation. Generate from **Dashboard → Settings → Withdrawal API Key**. |
 | `INVENTPAY_BASE_URL` | No | API base URL (default: `https://api.inventpay.io`) |
 
 ## License
