@@ -139,11 +139,11 @@ server.tool(
   {
     amount: z.number().describe("Payment amount"),
     amountCurrency: z
-      .enum(["USD", "USDT", "BTC", "LTC", "ETH"])
+      .enum(["USD", "USDT", "BTC", "LTC", "ETH", "SOL"])
       .default("USDT")
       .describe("Currency the amount is denominated in"),
     currency: z
-      .enum(["BTC", "ETH", "LTC", "USDT_ERC20", "USDT_BEP20"])
+      .enum(["BTC", "ETH", "LTC", "USDT_ERC20", "USDT_BEP20", "SOL", "USDC_SOL", "USDC_BEP20"])
       .describe("Cryptocurrency the customer will pay with"),
     orderId: z
       .string()
@@ -171,7 +171,7 @@ server.tool(
   {
     amount: z.number().describe("Invoice amount"),
     amountCurrency: z
-      .enum(["USD", "USDT", "BTC", "LTC", "ETH"])
+      .enum(["USD", "USDT", "BTC", "LTC", "ETH", "SOL"])
       .default("USDT")
       .describe("Currency the amount is denominated in"),
     orderId: z
@@ -225,7 +225,7 @@ server.tool(
   {
     amount: z.number().describe("Amount to withdraw"),
     currency: z
-      .enum(["BTC", "ETH", "LTC", "USDT_ERC20", "USDT_BEP20"])
+      .enum(["BTC", "ETH", "LTC", "USDT_ERC20", "USDT_BEP20", "SOL", "USDC_SOL", "USDC_BEP20"])
       .describe("Cryptocurrency to withdraw"),
     destinationAddress: z
       .string()
