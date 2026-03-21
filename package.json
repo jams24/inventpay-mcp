@@ -1,6 +1,6 @@
 {
   "name": "inventpay-mcp",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "mcpName": "io.github.jams24/inventpay-mcp",
   "description": "InventPay MCP Server - Give AI agents the ability to manage crypto payments, stores, products, and orders",
   "type": "module",
