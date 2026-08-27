@@ -139,12 +139,14 @@ server.tool(
   {
     amount: z.number().describe("Payment amount"),
     amountCurrency: z
-      .enum(["USD", "USDT", "BTC", "LTC", "ETH", "SOL"])
+      .enum(["USD", "USDT", "BTC", "LTC", "ETH", "SOL", "XMR"])
       .default("USDT")
       .describe("Currency the amount is denominated in"),
     currency: z
-      .enum(["BTC", "ETH", "LTC", "USDT_ERC20", "USDT_BEP20", "SOL", "USDC_SOL", "USDC_BEP20"])
-      .describe("Cryptocurrency the customer will pay with"),
+      .enum(["BTC", "ETH", "LTC", "XMR", "USDT_ERC20", "USDT_BEP20", "SOL", "USDC_SOL", "USDC_BEP20"])
+      .describe(
+      "Cryptocurrency the customer will pay with. XMR is only available on deployments with a Monero wallet configured — call get_supported_currencies first if you intend to offer it."
+    ),
     orderId: z
       .string()
       .optional()
@@ -171,7 +173,7 @@ server.tool(
   {
     amount: z.number().describe("Invoice amount"),
     amountCurrency: z
-      .enum(["USD", "USDT", "BTC", "LTC", "ETH", "SOL"])
+      .enum(["USD", "USDT", "BTC", "LTC", "ETH", "SOL", "XMR"])
       .default("USDT")
       .describe("Currency the amount is denominated in"),
     orderId: z
@@ -205,6 +207,17 @@ server.tool(
 );
 
 // ============================================================================
+// CURRENCY TOOLS
+// ============================================================================
+
+server.tool(
+  "get_supported_currencies",
+  "List the cryptocurrencies this InventPay deployment actually accepts, with each one's network, display precision and how many confirmations it needs to settle. Call this before offering a customer a choice of currency: XMR in particular is only available when the deployment has a Monero wallet configured, so assuming it is supported will produce a rejected payment. No API key required.",
+  {},
+  async () => callApi("GET", "/v1/currencies")
+);
+
+// ============================================================================
 // BALANCE TOOLS
 // ============================================================================
 
@@ -225,8 +238,10 @@ server.tool(
   {
     amount: z.number().describe("Amount to withdraw"),
     currency: z
-      .enum(["BTC", "ETH", "LTC", "USDT_ERC20", "USDT_BEP20", "SOL", "USDC_SOL", "USDC_BEP20"])
-      .describe("Cryptocurrency to withdraw"),
+      .enum(["BTC", "ETH", "LTC", "XMR", "USDT_ERC20", "USDT_BEP20", "SOL", "USDC_SOL", "USDC_BEP20"])
+      .describe(
+      "Cryptocurrency to withdraw. XMR is only available on deployments with a Monero wallet configured — call get_supported_currencies first if you intend to use it."
+    ),
     destinationAddress: z
       .string()
       .describe("External wallet address to send funds to"),

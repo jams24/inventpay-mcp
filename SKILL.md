@@ -30,7 +30,7 @@ This skill connects your agent to [InventPay](https://inventpay.io)'s payment in
 
 Your agent gets real tools that let it:
 
-- Create crypto payment links and invoices (BTC, ETH, LTC, USDT)
+- Create crypto payment links and invoices (BTC, ETH, LTC, XMR, SOL, USDT, USDC)
 - Run a full digital storefront with automatic product delivery
 - Check balances across all currencies
 - Track orders and view store analytics
@@ -182,7 +182,7 @@ This is a practical setup for monetizing premium skill files:
 1. **Create your store** — your agent can do this in one message
 2. **Add skill files as products** — set a price and provide a hosted download URL for the file (e.g. a GitHub release, S3 link, or any file hosting service)
 3. **Share your store link** — it'll be `inventpay.io/store/your-slug`
-4. **Buyers pay with crypto** — BTC, ETH, LTC, or USDT
+4. **Buyers pay with crypto** — BTC, ETH, LTC, XMR, SOL, USDT or USDC
 5. **Delivery is automatic** — buyer pays, gets the download link immediately
 6. **Withdraw earnings** — send to your wallet whenever you want
 
@@ -285,15 +285,31 @@ Then use the global binary in your config:
 
 ## Supported currencies
 
-| Currency | Network |
-|----------|---------|
-| BTC | Bitcoin |
-| ETH | Ethereum |
-| LTC | Litecoin |
-| USDT | ERC-20 (Ethereum) |
-| USDT | BEP-20 (BSC) |
+| Currency | Network | Settles after |
+|----------|---------|---------------|
+| BTC | Bitcoin | 1 confirmation |
+| ETH | Ethereum | 12 confirmations |
+| LTC | Litecoin | 3 confirmations |
+| XMR | Monero | 10 confirmations (~20 min) |
+| SOL | Solana | 31 confirmations |
+| USDT | ERC-20 (Ethereum) | 12 confirmations |
+| USDT | BEP-20 (BSC) | 10 confirmations |
+| USDC | Solana / BEP-20 | 31 / 10 confirmations |
 
-Amount currencies for invoices: USD, USDT, BTC, ETH, LTC.
+Amount currencies for invoices: USD, USDT, BTC, ETH, LTC, SOL, XMR.
+
+**Do not assume this whole list is available.** Call `get_supported_currencies`
+to see what a given deployment accepts. XMR in particular requires the API to
+have a Monero wallet configured, and offering it where it is not will produce a
+rejected payment.
+
+Monero also behaves differently from the rest in ways worth telling a user:
+
+- It always takes **10 confirmations** (~20 minutes) — that is a consensus rule,
+  not a risk setting, and cannot be shortened.
+- There is **no block explorer link** for a Monero payment. Its stealth
+  addresses mean no third party can look up a payment by address, so do not
+  offer to "check it on the explorer".
 
 ## Environment variables
 
